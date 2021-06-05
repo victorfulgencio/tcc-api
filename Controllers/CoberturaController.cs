@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using tcc_back.Services;
+using tcc_back.SystemExceptions;
 
 namespace tcc_back.Controllers
 {
@@ -19,7 +20,14 @@ namespace tcc_back.Controllers
         [HttpGet("cities")]
         public ActionResult<IEnumerable<String>> GetCities([FromQuery] string uf)
         {
-            return Ok(_service.GetCitiesFromState(uf));
+            try
+            {
+                return Ok(_service.GetCitiesFromState(uf));
+            }
+            catch (AppException)
+            {
+                return BadRequest("Parametro inválido");
+            }
         }
     }
 }
