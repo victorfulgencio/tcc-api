@@ -11,10 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using System.Data.SqlClient;
 using tcc_back.Repositories;
 using tcc_back.Services;
-using MySql.Data;
 using MySql.Data.MySqlClient;
 
 namespace tcc_back
@@ -55,7 +53,8 @@ namespace tcc_back
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "tcc_back v1"));
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
             app.UseRouting();
 
