@@ -29,5 +29,18 @@ namespace tcc_back.Controllers
                 return BadRequest("Parametro inválido");
             }
         }
+
+        [HttpGet("areas")]
+        public ActionResult<IEnumerable<string>> GetAreas([FromQuery] string uf, [FromQuery] string city)
+        {
+            try
+            {
+                return Ok(_service.GetAreas(uf, city));
+            }
+            catch (AppException)
+            {
+                return BadRequest("Parametro inválido");
+            }
+        }
     }
 }

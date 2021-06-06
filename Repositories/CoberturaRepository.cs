@@ -22,7 +22,7 @@ namespace tcc_back.Repositories
 
         public string GetCityCode(string uf, string city)
         {
-            const string sql = @"SELECT DISTINCT Codigo_Municipio FROM tcc.cobertura WHERE UF = (@UF) AND Municipio = (@City) LIMIT 1";
+            const string sql = @"SELECT DISTINCT Codigo_Municipio FROM cobertura WHERE UF = (@UF) AND Municipio = (@City) LIMIT 1";
             try
             {
                 return _dbConnection.QuerySingle<string>(sql, new { UF = uf, City = city });
@@ -31,6 +31,12 @@ namespace tcc_back.Repositories
             {
                 return null;
             }
+        }
+
+        public IEnumerable<Cobertura> GetAreas(string uf, string city)
+        {
+            const string sql = @"SELECT DISTINCT Setor_Censitario, Tipo_Setor, Bairro FROM cobertura WHERE UF = (@UF) AND Municipio = (@City)";
+            return _dbConnection.Query<Cobertura>(sql, new { UF = uf, City = city });
         }
     }
 

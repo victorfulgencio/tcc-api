@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using tcc_back.Models;
 
 namespace tcc_back.Repositories
 {
@@ -6,6 +7,7 @@ namespace tcc_back.Repositories
     {
         IEnumerable<string> GetCities(string uf);
         string GetCityCode(string uf, string city);
+        IEnumerable<Cobertura> GetAreas(string uf, string city);
     }
 
 }
