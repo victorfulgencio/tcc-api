@@ -18,7 +18,7 @@ namespace tcc_back.Controllers
         }
 
         [HttpGet("cities")]
-        public ActionResult<IEnumerable<String>> GetCities([FromQuery] string uf)
+        public ActionResult<IEnumerable<string>> GetCities([FromQuery] string uf)
         {
             try
             {

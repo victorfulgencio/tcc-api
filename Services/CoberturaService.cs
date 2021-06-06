@@ -18,7 +18,17 @@ namespace tcc_back.Services
         {
             Validation.emptyParameter(uf);
             var result = _repository.GetCities(uf);
-            Validation.emptyList(result.ToList());
+            Validation.emptyResultList(result.ToList());
+
+            return result;
+        }
+
+        public string GetCityCode(string uf, string city)
+        {
+            Validation.emptyParameter(uf);
+            Validation.emptyParameter(city);
+            var result = _repository.GetCityCode(uf, city);
+            Validation.emptyResult(result);
 
             return result;
         }

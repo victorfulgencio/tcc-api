@@ -7,7 +7,7 @@ namespace tcc_back.util
 {
     public static class Validation
     {
-        public static void emptyList<T>(List<T> list)
+        public static void emptyResultList<T>(List<T> list)
         {
             if (!list.Any())
                 throw new NotFoundException();
@@ -17,6 +17,12 @@ namespace tcc_back.util
         {
             if (String.IsNullOrEmpty(str))
                 throw new InvalidParameterException();
+        }
+
+        public static void emptyResult(string str)
+        {
+            if (String.IsNullOrEmpty(str))
+                throw new NotFoundException();
         }
 
     }

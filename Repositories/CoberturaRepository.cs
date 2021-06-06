@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using System.Collections.Generic;
 using tcc_back.Models;
@@ -17,6 +18,19 @@ namespace tcc_back.Repositories
         {
             const string sql = @"SELECT DISTINCT MUNICIPIO FROM cobertura WHERE UF = (@UF) ORDER BY MUNICIPIO";
             return _dbConnection.Query<string>(sql, new { UF = uf });
+        }
+
+        public string GetCityCode(string uf, string city)
+        {
+            const string sql = @"SELECT DISTINCT Codigo_Municipio FROM tcc.cobertura WHERE UF = (@UF) AND Municipio = (@City) LIMIT 1";
+            try
+            {
+                return _dbConnection.QuerySingle<string>(sql, new { UF = uf, City = city });
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
         }
     }
 

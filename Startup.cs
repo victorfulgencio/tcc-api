@@ -33,6 +33,7 @@ namespace tcc_back
             services.AddTransient<IDbConnection>((sp) => new MySqlConnection(dbConnectionString));
 
             services.AddScoped<ICoberturaRepository, CoberturaRepository>();
+            services.AddScoped<IKmlFileService, KmlFileService>();
 
             services.AddScoped<ICoberturaService, CoberturaService>();
 
@@ -57,6 +58,8 @@ namespace tcc_back
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseCors(option => option.AllowAnyOrigin());
 
             app.UseAuthorization();
 
