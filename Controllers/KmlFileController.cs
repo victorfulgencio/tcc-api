@@ -22,7 +22,8 @@ namespace tcc_back.Controllers
         {
             try
             {
-                return Ok(_service.GetFilePath(uf, city));
+                var result = _service.GetFilePath(uf, city).Replace("\0", string.Empty);
+                return Ok($"\"{result}\"");
             }
             catch (NotFoundException)
             {
