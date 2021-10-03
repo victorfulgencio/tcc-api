@@ -370,6 +370,11 @@ bin/*
 bin*
 *.dll
 
+obj/Debug
+obj/Debug*
+obj/Release
+obj/Release*
+
 # VS Code files for those working on multiple tools
 .vscode/*
 !.vscode/settings.json
