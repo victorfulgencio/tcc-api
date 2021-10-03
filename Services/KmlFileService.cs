@@ -17,7 +17,7 @@ namespace tcc_back.Services
         {
             var cityCode = this.GetCityCode(uf, city);
             var cityNameWithouAccents = RemoveAccents(city);
-            return $"{cityCode}_{cityNameWithouAccents}_Setores_2020.kml".Replace(" ", "+");
+            return $"{cityCode}_{cityNameWithouAccents}_Setores_2020.geojson".Replace(" ", "+");
         }
 
         private string RemoveAccents(string text)
