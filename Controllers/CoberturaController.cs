@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using tcc_back.Dtos;
 using tcc_back.Services;
 using tcc_back.SystemExceptions;
 
@@ -36,6 +37,19 @@ namespace tcc_back.Controllers
             try
             {
                 return Ok(_service.GetAreas(uf, city));
+            }
+            catch (AppException)
+            {
+                return BadRequest("Parametro inválido");
+            }
+        }
+        
+        [HttpPost]
+        public async Task<ActionResult<IEnumerable<string>>> ComputeFuzzyClassifier([FromBody] FuzzyClassifierInputDto inputDto)
+        {
+            try
+            {
+                return Ok(await _service.GetFuzzyClassifierOutput(inputDto));
             }
             catch (AppException)
             {

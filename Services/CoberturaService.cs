@@ -3,16 +3,26 @@ using tcc_back.Repositories;
 using tcc_back.Dtos;
 using tcc_back.util;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using tcc_back.Models;
 
 namespace tcc_back.Services
 {
     public class CoberturaService : ICoberturaService
     {
-        public CoberturaService(ICoberturaRepository repository)
+        public CoberturaService(ICoberturaRepository repository, IConfiguration config)
         {
             _repository = repository;
+            _httpClient = new HttpClient();
+            _config = config;
         }
 
+        private readonly IConfiguration _config;
+        private readonly HttpClient _httpClient; 
         private readonly ICoberturaRepository _repository;
 
         public IEnumerable<string> GetCitiesFromState(string uf)
@@ -40,12 +50,55 @@ namespace tcc_back.Services
             Validation.emptyParameter(city);
             var coberturaModelList = _repository.GetAreas(uf, city);
 
-            var result = coberturaModelList.Select((cobertura) =>
+            var result = coberturaModelList.Select(cobertura =>
                 new AreaDto(cobertura.Setor_Censitario, cobertura.Bairro, cobertura.Tipo_Setor)
             ).ToList();
 
             Validation.emptyResultList(result);
 
+            return result;
+        }
+
+        private async Task<decimal?> GetFuzzyOutput(FuzzyInputs input)
+        {
+            var httpContent = new StringContent(JsonConvert.SerializeObject(input), Encoding.UTF8, "application/json");
+            var fuzzyLambdaUrl = _config.GetValue<string>("FuzzyLambdaUrl");
+            var response = await _httpClient.PostAsync(fuzzyLambdaUrl, httpContent);
+            var responseString = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<RatingDto>(responseString)?.rating;
+        }
+        
+        public async Task<IEnumerable<MobileOperator>> GetFuzzyClassifierOutput(FuzzyClassifierInputDto inputDto)
+        {
+            var cityCoverageList = _repository.GetCityAvgPercentualCobertura(inputDto.state, inputDto.city);
+            var areasCoverageList = _repository.GetAreasAvgPercentualCobertura(inputDto.selectedAreas);
+
+            var result = new List<MobileOperator>();
+            var mobileOperators = cityCoverageList.Select(c => c.Operadora).Distinct();
+            foreach (var mobileOperator in mobileOperators)
+            {
+                var fuzzyInputsObject = new FuzzyInputs();
+                fuzzyInputsObject.city_coverage2G = cityCoverageList.Where(c => c.Operadora == mobileOperator && c.Tecnologia == "2G")
+                    .Select(c => c.Percentual_Cobertura).FirstOrDefault();
+                fuzzyInputsObject.city_coverage3G  = cityCoverageList.Where(c => c.Operadora == mobileOperator && c.Tecnologia == "3G")
+                    .Select(c => c.Percentual_Cobertura).FirstOrDefault();
+                fuzzyInputsObject.city_coverage4G  = cityCoverageList.Where(c => c.Operadora == mobileOperator && c.Tecnologia == "4G")
+                    .Select(c => c.Percentual_Cobertura).FirstOrDefault();
+                
+                fuzzyInputsObject.most_valuable_areas_coverage2G = areasCoverageList.Where(c => c.Operadora == mobileOperator && c.Tecnologia == "2G")
+                    .Select(c => c.Percentual_Cobertura).FirstOrDefault();
+                fuzzyInputsObject.most_valuable_areas_coverage3G = areasCoverageList.Where(c => c.Operadora == mobileOperator && c.Tecnologia == "3G")
+                    .Select(c => c.Percentual_Cobertura).FirstOrDefault();
+                fuzzyInputsObject.most_valuable_areas_coverage4G = areasCoverageList.Where(c => c.Operadora == mobileOperator && c.Tecnologia == "4G")
+                    .Select(c => c.Percentual_Cobertura).FirstOrDefault();
+
+                fuzzyInputsObject.cost = 0;
+                fuzzyInputsObject.service = 0; 
+                fuzzyInputsObject.claimed_issues = 0;
+                
+                result.Add(new () { Name = mobileOperator, Rating = await GetFuzzyOutput(fuzzyInputsObject) });
+            }
+            
             return result;
         }
     }

@@ -45,3 +45,4 @@
 /home/victor/projects/tcc/tcc-back/bin/Debug/net5.0/System.Configuration.ConfigurationManager.dll
 /home/victor/projects/tcc/tcc-back/bin/Debug/net5.0/System.Security.Cryptography.ProtectedData.dll
 /home/victor/projects/tcc/tcc-back/bin/Debug/net5.0/runtimes/win/lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll
+/home/victor/projects/tcc/tcc-back/bin/Debug/net5.0/Newtonsoft.Json.dll

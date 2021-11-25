@@ -34,7 +34,6 @@ namespace tcc_back
 
             services.AddScoped<ICoberturaRepository, CoberturaRepository>();
             services.AddScoped<IKmlFileService, KmlFileService>();
-
             services.AddScoped<ICoberturaService, CoberturaService>();
 
             services.AddControllers();

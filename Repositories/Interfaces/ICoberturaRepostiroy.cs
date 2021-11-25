@@ -8,6 +8,8 @@ namespace tcc_back.Repositories
         IEnumerable<string> GetCities(string uf);
         string GetCityCode(string uf, string city);
         IEnumerable<Cobertura> GetAreas(string uf, string city);
+        IEnumerable<CoveragePercentage> GetCityAvgPercentualCobertura(string uf, string city);
+        IEnumerable<CoveragePercentage> GetAreasAvgPercentualCobertura(IEnumerable<string> selectedAreas);
     }
 
 }

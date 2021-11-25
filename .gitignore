@@ -10,6 +10,9 @@
 *.userosscache
 *.sln.docstates
 
+./bin*
+bin*
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -369,6 +372,7 @@ FodyWeavers.xsd
 bin/*
 bin*
 *.dll
+./bin*
 
 obj/Debug
 obj/Debug*
