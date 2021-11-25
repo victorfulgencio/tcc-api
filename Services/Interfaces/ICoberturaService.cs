@@ -12,7 +12,7 @@ namespace tcc_back.Services
 
         IEnumerable<AreaDto> GetAreas(string uf, string city);
 
-        Task<IEnumerable<MobileOperator>>  GetFuzzyClassifierOutput(FuzzyClassifierInputDto inputDto);
+        Task<IEnumerable<MobileOperator>> GetFuzzyClassifierOutputAsync(FuzzyClassifierInputDto inputDto);
     }
 
 }

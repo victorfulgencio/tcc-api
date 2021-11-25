@@ -53,6 +53,20 @@ namespace tcc_back.Repositories
                                 FROM cobertura WHERE Setor_Censitario in @Areas GROUP BY Operadora, Tecnologia";
       return _dbConnection.Query<CoveragePercentage>(sql, new { Areas = selectedAreas });
     }
+
+    public double GetTotalAccessFor(string uf, string city, string company)
+    {
+      const string sql = @"SELECT  AcessosTotais FROM acessos_totais_empresa_municipio
+                                WHERE UF = (@UF) AND Municipio = (@City) AND Empresa = (@Company)";
+      return _dbConnection.Query<double>(sql, new { UF = uf, City = city, Company = company }).FirstOrDefault();
+    }
+
+    public double GetTotalClaimedIssuesFor(string uf, string city, string company)
+    {
+      const string sql = @"SELECT  TotalReclamacoes FROM total_reclamacoes_cidade_marca
+                                WHERE UF = (@UF) AND Cidade = (@City) AND Marca = (@Company)";
+      return _dbConnection.Query<double>(sql, new { UF = uf, City = city, Company = company }).FirstOrDefault();
+    }
   }
 
 }

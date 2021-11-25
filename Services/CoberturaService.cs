@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using tcc_back.Repositories;
 using tcc_back.Dtos;
@@ -59,7 +60,7 @@ namespace tcc_back.Services
             return result;
         }
 
-        private async Task<decimal?> GetFuzzyOutput(FuzzyInputs input)
+        private async Task<decimal?> PostForFuzzyOutputAsync(FuzzyInputs input)
         {
             var httpContent = new StringContent(JsonConvert.SerializeObject(input), Encoding.UTF8, "application/json");
             var fuzzyLambdaUrl = _config.GetValue<string>("FuzzyLambdaUrl");
@@ -68,13 +69,13 @@ namespace tcc_back.Services
             return JsonConvert.DeserializeObject<RatingDto>(responseString)?.rating;
         }
         
-        public async Task<IEnumerable<MobileOperator>> GetFuzzyClassifierOutput(FuzzyClassifierInputDto inputDto)
+        public async Task<IEnumerable<MobileOperator>> GetFuzzyClassifierOutputAsync(FuzzyClassifierInputDto inputDto)
         {
             var cityCoverageList = _repository.GetCityAvgPercentualCobertura(inputDto.state, inputDto.city);
             var areasCoverageList = _repository.GetAreasAvgPercentualCobertura(inputDto.selectedAreas);
 
             var result = new List<MobileOperator>();
-            var mobileOperators = cityCoverageList.Select(c => c.Operadora).Distinct();
+            var mobileOperators = cityCoverageList.Select(c => c.Operadora.ToUpper()).Distinct();
             foreach (var mobileOperator in mobileOperators)
             {
                 var fuzzyInputsObject = new FuzzyInputs();
@@ -92,11 +93,18 @@ namespace tcc_back.Services
                 fuzzyInputsObject.most_valuable_areas_coverage4G = areasCoverageList.Where(c => c.Operadora == mobileOperator && c.Tecnologia == "4G")
                     .Select(c => c.Percentual_Cobertura).FirstOrDefault();
 
-                fuzzyInputsObject.cost = 0;
-                fuzzyInputsObject.service = 0; 
-                fuzzyInputsObject.claimed_issues = 0;
+                fuzzyInputsObject.cost = 0;// buscar isso no banco
+                fuzzyInputsObject.service = 0; // buscar isso no banco
+
+                var claimedIssues = _repository.GetTotalClaimedIssuesFor(inputDto.state, inputDto.city, mobileOperator);
+                var totalAccess = _repository.GetTotalAccessFor(inputDto.state, inputDto.city, mobileOperator);
+                fuzzyInputsObject.claimed_issues = Convert.ToDecimal(claimedIssues/totalAccess);
                 
-                result.Add(new () { Name = mobileOperator, Rating = await GetFuzzyOutput(fuzzyInputsObject) });
+                result.Add(new MobileOperator()
+                {
+                    Name = mobileOperator, 
+                    Rating = await PostForFuzzyOutputAsync(fuzzyInputsObject)
+                });
             }
             
             return result;

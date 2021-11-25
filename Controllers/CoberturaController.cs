@@ -49,7 +49,7 @@ namespace tcc_back.Controllers
         {
             try
             {
-                return Ok(await _service.GetFuzzyClassifierOutput(inputDto));
+                return Ok(await _service.GetFuzzyClassifierOutputAsync(inputDto));
             }
             catch (AppException)
             {
