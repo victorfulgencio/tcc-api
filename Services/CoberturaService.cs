@@ -68,7 +68,7 @@ namespace tcc_back.Services
             var responseString = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<RatingDto>(responseString)?.rating;
         }
-        
+
         public async Task<IEnumerable<MobileOperator>> GetFuzzyClassifierOutputAsync(FuzzyClassifierInputDto inputDto)
         {
             var cityCoverageList = _repository.GetCityAvgPercentualCobertura(inputDto.state, inputDto.city);
@@ -98,7 +98,15 @@ namespace tcc_back.Services
 
                 var claimedIssues = _repository.GetTotalClaimedIssuesFor(inputDto.state, inputDto.city, mobileOperator);
                 var totalAccess = _repository.GetTotalAccessFor(inputDto.state, inputDto.city, mobileOperator);
-                fuzzyInputsObject.claimed_issues = Convert.ToDecimal(claimedIssues/totalAccess);
+                try
+                {
+                    fuzzyInputsObject.claimed_issues = Convert.ToDecimal(claimedIssues / totalAccess);
+                }
+                catch (OverflowException)
+                {
+                    // maybe the total value would be too big for decimal
+                    fuzzyInputsObject.claimed_issues = claimedIssues > totalAccess ? decimal.MaxValue : decimal.MinValue;
+                }
                 
                 result.Add(new MobileOperator()
                 {
