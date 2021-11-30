@@ -69,6 +69,25 @@ namespace tcc_back.Services
             return JsonConvert.DeserializeObject<RatingDto>(responseString)?.rating;
         }
 
+        private void SetDefaultValuesIfNull(FuzzyInputs fuzzyParams)
+        {
+            fuzzyParams.cost ??= 120; // R$120,00
+            fuzzyParams.service ??= 30; // 50 GB/month
+        }
+
+        private void SetClaimedIssuesPerAccess(FuzzyInputs fuzzyParams, double claimedIssues, double totalAccess)
+        {
+            try
+            {
+                fuzzyParams.claimed_issues = Convert.ToDecimal(claimedIssues / totalAccess);
+            }
+            catch (OverflowException)
+            {
+                // maybe the total value would be too big/ too low for decimal type
+                fuzzyParams.claimed_issues = claimedIssues > totalAccess ? decimal.MaxValue : decimal.MinValue;
+            }
+        }
+        
         public async Task<IEnumerable<MobileOperator>> GetFuzzyClassifierOutputAsync(FuzzyClassifierInputDto inputDto)
         {
             var cityCoverageList = _repository.GetCityAvgPercentualCobertura(inputDto.state, inputDto.city);
@@ -93,21 +112,13 @@ namespace tcc_back.Services
                 fuzzyInputsObject.most_valuable_areas_coverage4G = areasCoverageList.Where(c => c.Operadora == mobileOperator && c.Tecnologia == "4G")
                     .Select(c => c.Percentual_Cobertura).FirstOrDefault();
 
-                fuzzyInputsObject.cost = 0;// buscar isso no banco
-                fuzzyInputsObject.service = 0; // buscar isso no banco
+                 (fuzzyInputsObject.cost, fuzzyInputsObject.service) = _repository.GetPlanForMobileOperator(inputDto.state, inputDto.city, mobileOperator);
 
                 var claimedIssues = _repository.GetTotalClaimedIssuesFor(inputDto.state, inputDto.city, mobileOperator);
                 var totalAccess = _repository.GetTotalAccessFor(inputDto.state, inputDto.city, mobileOperator);
-                try
-                {
-                    fuzzyInputsObject.claimed_issues = Convert.ToDecimal(claimedIssues / totalAccess);
-                }
-                catch (OverflowException)
-                {
-                    // maybe the total value would be too big for decimal
-                    fuzzyInputsObject.claimed_issues = claimedIssues > totalAccess ? decimal.MaxValue : decimal.MinValue;
-                }
-                
+                SetClaimedIssuesPerAccess(fuzzyInputsObject, claimedIssues, totalAccess);
+                SetDefaultValuesIfNull(fuzzyInputsObject);
+                    
                 result.Add(new MobileOperator()
                 {
                     Name = mobileOperator, 

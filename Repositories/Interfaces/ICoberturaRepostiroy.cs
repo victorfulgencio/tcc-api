@@ -12,6 +12,7 @@ namespace tcc_back.Repositories
         IEnumerable<CoveragePercentage> GetAreasAvgPercentualCobertura(IEnumerable<string> selectedAreas);
         double GetTotalAccessFor(string uf, string city, string company);
         double GetTotalClaimedIssuesFor(string uf, string city, string company);
+        (decimal? price, int? gigabytes) GetPlanForMobileOperator(string uf, string city, string company);
     }
 
 }

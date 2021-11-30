@@ -10,8 +10,8 @@ namespace tcc_back.Models
         public decimal most_valuable_areas_coverage3G { get; set; }
         public decimal most_valuable_areas_coverage4G { get; set; }
         
-        public decimal cost { get; set; }
-        public decimal service { get; set; }
+        public decimal? cost { get; set; }
+        public int? service { get; set; }
         public decimal claimed_issues { get; set; }
     }
 }

@@ -67,6 +67,13 @@ namespace tcc_back.Repositories
                                 WHERE UF = (@UF) AND Cidade = (@City) AND Marca = (@Company)";
       return _dbConnection.Query<double>(sql, new { UF = uf, City = city, Company = company }).FirstOrDefault();
     }
+
+    public (decimal? price, int? gigabytes) GetPlanForMobileOperator(string uf, string city, string company)
+    {
+      const string sql = @"SELECT  Valor, Gigabytes FROM planos
+                                WHERE UF = (@UF) AND Cidade = (@City) AND Operadora = (@Company)";
+      return _dbConnection.Query<(decimal? price, int? gigabytes)>(sql, new { UF = uf, City = city, Company = company }).FirstOrDefault();
+    }
   }
 
 }
